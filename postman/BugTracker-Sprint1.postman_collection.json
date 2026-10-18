@@ -1,0 +1,638 @@
+{
+  "info": {
+    "name": "Bug Tracker - Sprint 1",
+    "description": "HU-1 y HU-2. CP-19 (lista vacía) se corre aparte con la base vacía.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "ultimoId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "CP-01 Crear bug válido",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 201', ()=>pm.response.to.have.status(201));",
+              "const b=pm.response.json();",
+              "pm.test('Estado ABIERTO',()=>pm.expect(b.estado).to.eql('ABIERTO'));",
+              "pm.test('Tiene id y fecha',()=>{pm.expect(b.id).to.exist;pm.expect(b.fechaCreacion).to.exist;});",
+              "pm.collectionVariables.set('ultimoId',b.id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/bugs",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"titulo\": \"Error en login\", \"descripcion\": \"No deja entrar con datos válidos\", \"prioridad\": \"ALTA\", \"severidad\": \"MEDIA\"}"
+        }
+      }
+    },
+    {
+      "name": "CP-02 Título vacío",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 400', ()=>pm.response.to.have.status(400));",
+              "pm.test('Error en titulo', ()=>pm.expect(pm.response.json().errores).to.have.property('titulo'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/bugs",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"titulo\": \"\", \"descripcion\": \"No deja entrar con datos válidos\", \"prioridad\": \"ALTA\", \"severidad\": \"MEDIA\"}"
+        }
+      }
+    },
+    {
+      "name": "CP-03 Título ausente",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 400', ()=>pm.response.to.have.status(400));",
+              "pm.test('Error en titulo', ()=>pm.expect(pm.response.json().errores).to.have.property('titulo'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/bugs",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"descripcion\": \"No deja entrar con datos válidos\", \"prioridad\": \"ALTA\", \"severidad\": \"MEDIA\"}"
+        }
+      }
+    },
+    {
+      "name": "CP-04 Título solo espacios",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 400', ()=>pm.response.to.have.status(400));",
+              "pm.test('Error en titulo', ()=>pm.expect(pm.response.json().errores).to.have.property('titulo'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/bugs",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"titulo\": \"   \", \"descripcion\": \"No deja entrar con datos válidos\", \"prioridad\": \"ALTA\", \"severidad\": \"MEDIA\"}"
+        }
+      }
+    },
+    {
+      "name": "CP-05 Título 149",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 201', ()=>pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('ultimoId',pm.response.json().id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/bugs",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"titulo\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"descripcion\": \"No deja entrar con datos válidos\", \"prioridad\": \"ALTA\", \"severidad\": \"MEDIA\"}"
+        }
+      }
+    },
+    {
+      "name": "CP-06 Título 150",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 201', ()=>pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('ultimoId',pm.response.json().id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/bugs",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"titulo\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"descripcion\": \"No deja entrar con datos válidos\", \"prioridad\": \"ALTA\", \"severidad\": \"MEDIA\"}"
+        }
+      }
+    },
+    {
+      "name": "CP-07 Título 151",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 400', ()=>pm.response.to.have.status(400));",
+              "pm.test('Error en titulo', ()=>pm.expect(pm.response.json().errores).to.have.property('titulo'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/bugs",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"titulo\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"descripcion\": \"No deja entrar con datos válidos\", \"prioridad\": \"ALTA\", \"severidad\": \"MEDIA\"}"
+        }
+      }
+    },
+    {
+      "name": "CP-08 Descripción vacía",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 400', ()=>pm.response.to.have.status(400));",
+              "pm.test('Error en descripcion', ()=>pm.expect(pm.response.json().errores).to.have.property('descripcion'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/bugs",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"titulo\": \"Error en login\", \"descripcion\": \"\", \"prioridad\": \"ALTA\", \"severidad\": \"MEDIA\"}"
+        }
+      }
+    },
+    {
+      "name": "CP-09 Descripción 2000",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 201', ()=>pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('ultimoId',pm.response.json().id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/bugs",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"titulo\": \"Error en login\", \"descripcion\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"prioridad\": \"ALTA\", \"severidad\": \"MEDIA\"}"
+        }
+      }
+    },
+    {
+      "name": "CP-10 Descripción 2001",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 400', ()=>pm.response.to.have.status(400));",
+              "pm.test('Error en descripcion', ()=>pm.expect(pm.response.json().errores).to.have.property('descripcion'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/bugs",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"titulo\": \"Error en login\", \"descripcion\": \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\", \"prioridad\": \"ALTA\", \"severidad\": \"MEDIA\"}"
+        }
+      }
+    },
+    {
+      "name": "CP-11 Prioridad BAJA",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 201', ()=>pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('ultimoId',pm.response.json().id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/bugs",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"titulo\": \"Error en login\", \"descripcion\": \"No deja entrar con datos válidos\", \"prioridad\": \"BAJA\", \"severidad\": \"MEDIA\"}"
+        }
+      }
+    },
+    {
+      "name": "CP-11 Prioridad MEDIA",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 201', ()=>pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('ultimoId',pm.response.json().id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/bugs",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"titulo\": \"Error en login\", \"descripcion\": \"No deja entrar con datos válidos\", \"prioridad\": \"MEDIA\", \"severidad\": \"MEDIA\"}"
+        }
+      }
+    },
+    {
+      "name": "CP-11 Prioridad ALTA",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 201', ()=>pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('ultimoId',pm.response.json().id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/bugs",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"titulo\": \"Error en login\", \"descripcion\": \"No deja entrar con datos válidos\", \"prioridad\": \"ALTA\", \"severidad\": \"MEDIA\"}"
+        }
+      }
+    },
+    {
+      "name": "CP-11 Prioridad CRITICA",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 201', ()=>pm.response.to.have.status(201));",
+              "pm.collectionVariables.set('ultimoId',pm.response.json().id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/bugs",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"titulo\": \"Error en login\", \"descripcion\": \"No deja entrar con datos válidos\", \"prioridad\": \"CRITICA\", \"severidad\": \"MEDIA\"}"
+        }
+      }
+    },
+    {
+      "name": "CP-12 Prioridad inválida",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 400', ()=>pm.response.to.have.status(400));",
+              "pm.test('Error en prioridad', ()=>pm.expect(pm.response.json().errores).to.have.property('prioridad'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/bugs",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"titulo\": \"Error en login\", \"descripcion\": \"No deja entrar con datos válidos\", \"prioridad\": \"URGENTE\", \"severidad\": \"MEDIA\"}"
+        }
+      }
+    },
+    {
+      "name": "CP-13 Prioridad ausente",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 400', ()=>pm.response.to.have.status(400));",
+              "pm.test('Error en prioridad', ()=>pm.expect(pm.response.json().errores).to.have.property('prioridad'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/bugs",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"titulo\": \"Error en login\", \"descripcion\": \"No deja entrar con datos válidos\", \"severidad\": \"MEDIA\"}"
+        }
+      }
+    },
+    {
+      "name": "CP-14 Severidad inválida",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 400', ()=>pm.response.to.have.status(400));",
+              "pm.test('Error en severidad', ()=>pm.expect(pm.response.json().errores).to.have.property('severidad'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/bugs",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"titulo\": \"Error en login\", \"descripcion\": \"No deja entrar con datos válidos\", \"prioridad\": \"ALTA\", \"severidad\": \"X\"}"
+        }
+      }
+    },
+    {
+      "name": "CP-15 Varios campos inválidos",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 400', ()=>pm.response.to.have.status(400));",
+              "pm.test('Error en titulo', ()=>pm.expect(pm.response.json().errores).to.have.property('titulo'));",
+              "pm.test('Error en prioridad', ()=>pm.expect(pm.response.json().errores).to.have.property('prioridad'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/bugs",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"titulo\": \"\", \"descripcion\": \"No deja entrar con datos válidos\", \"prioridad\": \"URGENTE\", \"severidad\": \"MEDIA\"}"
+        }
+      }
+    },
+    {
+      "name": "CP-16 Estado enviado se ignora",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 201', ()=>pm.response.to.have.status(201));",
+              "const b=pm.response.json();",
+              "pm.test('Queda ABIERTO',()=>pm.expect(b.estado).to.eql('ABIERTO'));",
+              "pm.test('id no es 999',()=>pm.expect(b.id).to.not.eql(999));",
+              "pm.collectionVariables.set('ultimoId',pm.response.json().id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/bugs",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"titulo\": \"Error en login\", \"descripcion\": \"No deja entrar con datos válidos\", \"prioridad\": \"ALTA\", \"severidad\": \"MEDIA\", \"estado\": \"CERRADO\", \"id\": 999, \"fechaCreacion\": \"2000-01-01T00:00:00\"}"
+        }
+      }
+    },
+    {
+      "name": "CP-17 JSON mal formado",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 400', ()=>pm.response.to.have.status(400));",
+              "pm.test('Sin stack trace',()=>pm.expect(pm.response.text()).to.not.include('Exception'));",
+              "pm.test('Error en body',()=>pm.expect(pm.response.json().errores).to.have.property('body'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/bugs",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"titulo\":"
+        }
+      }
+    },
+    {
+      "name": "CP-18 Caracteres especiales",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 201', ()=>pm.response.to.have.status(201));",
+              "pm.test('Se guarda tal cual',()=>pm.expect(pm.response.json().titulo).to.eql('Ñandú áé 🐞 <script>alert(1)</script>'));",
+              "pm.collectionVariables.set('ultimoId',pm.response.json().id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/bugs",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"titulo\": \"Ñandú áé 🐞 <script>alert(1)</script>\", \"descripcion\": \"No deja entrar con datos válidos\", \"prioridad\": \"ALTA\", \"severidad\": \"MEDIA\"}"
+        }
+      }
+    },
+    {
+      "name": "CP-21/22/23 Listar bugs (orden y campos)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status 200',()=>pm.response.to.have.status(200));",
+              "const l=pm.response.json();",
+              "pm.test('Es lista',()=>pm.expect(l).to.be.an('array'));",
+              "pm.test('Campos',()=>l.forEach(b=>pm.expect(b).to.include.keys('id','titulo','estado','prioridad','fechaCreacion')));",
+              "pm.test('Más recientes primero',()=>{for(let i=1;i<l.length;i++)pm.expect(new Date(l[i-1].fechaCreacion)>=new Date(l[i].fechaCreacion)).to.be.true;});",
+              "pm.test('Último creado aparece primero',()=>pm.expect(l[0].id).to.eql(pm.collectionVariables.get('ultimoId')));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/bugs"
+      }
+    }
+  ]
+}

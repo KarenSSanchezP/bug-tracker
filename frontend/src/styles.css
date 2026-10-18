@@ -1,0 +1,14 @@
+/* Estilos sencillos para la app */
+body { font-family: system-ui, sans-serif; background: #f4f5f7; margin: 0; color: #222; }
+.contenedor { max-width: 900px; margin: 0 auto; padding: 1rem; }
+.tarjeta { background: #fff; border-radius: 8px; padding: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,.1); margin-bottom: 1rem; }
+form label { display: block; margin-top: .75rem; font-weight: 600; }
+input, textarea, select { display: block; width: 100%; box-sizing: border-box; padding: .5rem; margin-top: .25rem; font: inherit; }
+.fila { display: flex; gap: 1rem; }
+.fila label { flex: 1; }
+button { margin-top: 1rem; padding: .6rem 1.2rem; background: #0b5cff; color: #fff; border: 0; border-radius: 6px; cursor: pointer; }
+button:disabled { opacity: .6; }
+.error { color: #c62828; font-size: .9rem; margin: .25rem 0 0; font-weight: normal; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: .5rem; border-bottom: 1px solid #eee; }
+.vacio { text-align: center; color: #666; }

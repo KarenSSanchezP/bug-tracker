@@ -8,7 +8,9 @@ export const ESTADOS = {
   CERRADO: 'Cerrado',
 }
 
-/** Formatea la fecha ISO del backend a algo legible, ej. "17/10/2026, 20:50". */
+/** Formatea la fecha ISO del backend como en la guía TRIAGE, ej. "2026-10-17 20:41" (hora local). */
 export function formatearFecha(iso) {
-  return new Date(iso).toLocaleString('es-SV', { dateStyle: 'short', timeStyle: 'short' })
+  const d = new Date(iso)
+  const dos = (n) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${dos(d.getMonth() + 1)}-${dos(d.getDate())} ${dos(d.getHours())}:${dos(d.getMinutes())}`
 }

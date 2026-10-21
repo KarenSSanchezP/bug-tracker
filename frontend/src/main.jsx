@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
+import './tokens.css'
 import './styles.css'
 
 // Monta la aplicación React dentro del <div id="root"> de index.html

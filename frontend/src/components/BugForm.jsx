@@ -1,22 +1,29 @@
-import { useState, useRef } from 'react'
+import { useRef, useState } from 'react'
 import { crearBug } from '../api/bugsApi'
 import { PRIORIDADES, SEVERIDADES } from '../etiquetas'
+import ContadorCaracteres from './ContadorCaracteres'
 
 // Valores iniciales del formulario (vacío)
 const FORM_VACIO = { titulo: '', descripcion: '', prioridad: '', severidad: '' }
+// Límites iguales a los del backend
+const MAX = { titulo: 150, descripcion: 2000 }
+// Orden de los campos: sirve para poner el foco en el PRIMER campo inválido
+const ORDEN = ['titulo', 'descripcion', 'prioridad', 'severidad']
 
-// Límites de caracteres
-const LIMITE_TITULO = 150
-const LIMITE_DESCRIPCION = 2000
-
-// Mensajes de error cuando se excede el límite (igual que backend)
-const ERROR_TITULO_EXCEDIDO = 'El título no puede tener más de 150 caracteres'
-const ERROR_DESCRIPCION_EXCEDIDA = 'La descripción no puede tener más de 2000 caracteres'
+/** Validación en el navegador con los mismos mensajes que devuelve el backend. */
+function validar(form) {
+  const e = {}
+  if (!form.titulo.trim()) e.titulo = 'El título es obligatorio'
+  else if (form.titulo.length > MAX.titulo) e.titulo = 'El título no puede tener más de 150 caracteres'
+  if (!form.descripcion.trim()) e.descripcion = 'La descripción es obligatoria'
+  else if (form.descripcion.length > MAX.descripcion) e.descripcion = 'La descripción no puede tener más de 2000 caracteres'
+  if (!form.prioridad) e.prioridad = 'La prioridad es obligatoria'
+  if (!form.severidad) e.severidad = 'La severidad es obligatoria'
+  return e
+}
 
 /**
- * Formulario para reportar un bug.
- * Muestra debajo de cada campo el error que devuelve el backend (400).
- * Incluye contador de caracteres y accesibilidad mejorada.
+ * Formulario HU-1: reportar un bug.
  * Props: onCreado(bug) se llama cuando el bug se guarda con éxito.
  */
 export default function BugForm({ onCreado }) {
@@ -24,85 +31,46 @@ export default function BugForm({ onCreado }) {
   const [errores, setErrores] = useState({})
   const [enviando, setEnviando] = useState(false)
   const [errorGeneral, setErrorGeneral] = useState('')
+  const [exito, setExito] = useState(null)
+  // Referencias a cada campo para mover el foco
+  const refs = { titulo: useRef(), descripcion: useRef(), prioridad: useRef(), severidad: useRef() }
 
-  // Referencias a los campos para mover el foco en caso de error
-  const tituloRef = useRef(null)
-  const descripcionRef = useRef(null)
-  const prioridadRef = useRef(null)
-  const severidadRef = useRef(null)
-
-  // Verifica si el título excede el límite
-  const tituloExcedido = form.titulo.length > LIMITE_TITULO
-  // Verifica si la descripción excede el límite
-  const descripcionExcedida = form.descripcion.length > LIMITE_DESCRIPCION
-
-  // Genera el error del contador si se excede el límite
-  const errorTituloContador = tituloExcedido ? ERROR_TITULO_EXCEDIDO : null
-  const errorDescripcionContador = descripcionExcedida ? ERROR_DESCRIPCION_EXCEDIDA : null
-
-  // El error a mostrar es el del contador (cliente) o el del backend
-  const errorTituloMostrar = errorTituloContador || errores.titulo
-  const errorDescripcionMostrar = errorDescripcionContador || errores.descripcion
-
-  // Actualiza el campo que cambió usando su atributo "name"
-  // y limpia el error de ese campo al editar
+  // Actualiza el campo y quita su error en cuanto se corrige
   function manejarCambio(e) {
     const { name, value } = e.target
-    setForm({ ...form, [name]: value })
-    // Limpiar error del backend cuando el usuario edita el campo
-    if (errores[name]) {
-      setErrores({ ...errores, [name]: undefined })
+    const nuevo = { ...form, [name]: value }
+    setForm(nuevo)
+    if (errores[name] && !validar(nuevo)[name]) {
+      const { [name]: _quitado, ...resto } = errores
+      setErrores(resto)
     }
   }
 
-  // Mueve el foco al primer campo con error
-  function enfocarPrimerError(erroresNuevos) {
-    const refs = [
-      { campo: 'titulo', ref: tituloRef },
-      { campo: 'descripcion', ref: descripcionRef },
-      { campo: 'prioridad', ref: prioridadRef },
-      { campo: 'severidad', ref: severidadRef },
-    ]
-    for (const { campo, ref } of refs) {
-      if (erroresNuevos[campo] && ref.current) {
-        ref.current.focus()
-        break
-      }
-    }
+  function enfocarPrimerError(errs) {
+    const primero = ORDEN.find((campo) => errs[campo])
+    if (primero) refs[primero].current?.focus()
   }
 
   async function manejarEnvio(e) {
     e.preventDefault()
-
-    // Validación del lado del cliente para límites de caracteres
-    const erroresCliente = {}
-    if (tituloExcedido) {
-      erroresCliente.titulo = ERROR_TITULO_EXCEDIDO
-    }
-    if (descripcionExcedida) {
-      erroresCliente.descripcion = ERROR_DESCRIPCION_EXCEDIDA
-    }
-    if (Object.keys(erroresCliente).length > 0) {
-      setErrores(erroresCliente)
-      enfocarPrimerError(erroresCliente)
+    setErrorGeneral('')
+    setExito(null)
+    const errs = validar(form)
+    if (Object.keys(errs).length > 0) {
+      setErrores(errs)
+      enfocarPrimerError(errs)
       return
     }
-
     setEnviando(true)
-    setErrorGeneral('')
     try {
-      // Mandamos null en vez de "" para que el backend diga "es obligatoria"
-      const datos = {
-        ...form,
-        prioridad: form.prioridad || null,
-        severidad: form.severidad || null,
-      }
-      const resultado = await crearBug(datos)
+      const resultado = await crearBug(form)
       if (resultado.ok) {
         setForm(FORM_VACIO)
         setErrores({})
+        setExito(resultado.bug)
         onCreado(resultado.bug)
       } else {
+        // Errores 400 del backend: se muestran igual que los del navegador
         setErrores(resultado.errores)
         enfocarPrimerError(resultado.errores)
       }
@@ -113,111 +81,105 @@ export default function BugForm({ onCreado }) {
     }
   }
 
+  function limpiar() {
+    setForm(FORM_VACIO)
+    setErrores({})
+    setErrorGeneral('')
+    setExito(null)
+  }
+
+  // Detalle QA #2: aria-describedby apunta al contador y, si hay error, también al mensaje
+  function describedBy(campo, conContador) {
+    const ids = []
+    if (conContador) ids.push(`contador-${campo}`)
+    if (errores[campo]) ids.push(`error-${campo}`)
+    return ids.length ? ids.join(' ') : undefined
+  }
+
+  const cantidadErrores = ORDEN.filter((c) => errores[c]).length
+
+  // Campo de texto con contador (título o descripción)
+  function campoTexto(campo, etiqueta, Componente, extra = {}) {
+    return (
+      <div className="campo">
+        <label htmlFor={campo}>{etiqueta} *</label>
+        <Componente
+          id={campo}
+          name={campo}
+          ref={refs[campo]}
+          value={form[campo]}
+          onChange={manejarCambio}
+          aria-invalid={errores[campo] ? 'true' : undefined}
+          aria-describedby={describedBy(campo, true)}
+          {...extra}
+        />
+        <div className="pie">
+          {errores[campo] && <span className="error" id={`error-${campo}`}>{errores[campo]}</span>}
+          <ContadorCaracteres id={`contador-${campo}`} actual={form[campo].length} max={MAX[campo]} />
+        </div>
+      </div>
+    )
+  }
+
+  // Select de prioridad o severidad
+  function campoSelect(campo, etiqueta, opciones) {
+    return (
+      <div className="campo">
+        <label htmlFor={campo}>{etiqueta} *</label>
+        <select
+          id={campo}
+          name={campo}
+          ref={refs[campo]}
+          value={form[campo]}
+          onChange={manejarCambio}
+          aria-invalid={errores[campo] ? 'true' : undefined}
+          aria-describedby={describedBy(campo, false)}
+        >
+          <option value="">Selecciona…</option>
+          {Object.entries(opciones).map(([valor, texto]) => (
+            <option key={valor} value={valor}>{texto}</option>
+          ))}
+        </select>
+        {errores[campo] && (
+          <div className="pie"><span className="error" id={`error-${campo}`}>{errores[campo]}</span></div>
+        )}
+      </div>
+    )
+  }
+
   return (
-    <form className="tarjeta" onSubmit={manejarEnvio} noValidate>
+    <form className="tarjeta" onSubmit={manejarEnvio} noValidate id="reportar">
       <h2>Reportar un bug</h2>
 
-      <label htmlFor="titulo">Título</label>
-      <input
-        id="titulo"
-        name="titulo"
-        ref={tituloRef}
-        value={form.titulo}
-        onChange={manejarCambio}
-        aria-invalid={errorTituloMostrar ? 'true' : undefined}
-        aria-describedby={errorTituloMostrar ? 'error-titulo' : 'contador-titulo'}
-      />
-      <div
-        id="contador-titulo"
-        className={`contador ${tituloExcedido ? 'excedido' : ''}`}
-        aria-live="polite"
-      >
-        {form.titulo.length}/{LIMITE_TITULO}
-      </div>
-      {errorTituloMostrar && (
-        <p id="error-titulo" className="error" role="alert">
-          {errorTituloMostrar}
-        </p>
+      {exito && (
+        <div className="alerta ok" role="status">
+          Bug #{exito.id} reportado correctamente. <a href="#lista">Ver lista de bugs</a>
+        </div>
+      )}
+      {cantidadErrores > 0 && (
+        <div className="alerta mal" role="alert">
+          Revisa los campos marcados. <span>{cantidadErrores} {cantidadErrores === 1 ? 'error' : 'errores'}.</span>
+        </div>
+      )}
+      {(errorGeneral || errores.body) && (
+        <div className="alerta mal" role="alert">{errorGeneral || errores.body}</div>
       )}
 
-      <label htmlFor="descripcion">Descripción</label>
-      <textarea
-        id="descripcion"
-        name="descripcion"
-        ref={descripcionRef}
-        value={form.descripcion}
-        onChange={manejarCambio}
-        rows={4}
-        aria-invalid={errorDescripcionMostrar ? 'true' : undefined}
-        aria-describedby={errorDescripcionMostrar ? 'error-descripcion' : 'contador-descripcion'}
-      />
-      <div
-        id="contador-descripcion"
-        className={`contador ${descripcionExcedida ? 'excedido' : ''}`}
-        aria-live="polite"
-      >
-        {form.descripcion.length}/{LIMITE_DESCRIPCION}
-      </div>
-      {errorDescripcionMostrar && (
-        <p id="error-descripcion" className="error" role="alert">
-          {errorDescripcionMostrar}
-        </p>
-      )}
+      {/* Sin maxLength: dejamos pasar del límite para que el contador se ponga rojo y se vea el error */}
+      {campoTexto('titulo', 'Título', 'input', { type: 'text' })}
+      {campoTexto('descripcion', 'Descripción', 'textarea', { rows: 4 })}
 
       <div className="fila">
-        <div>
-          <label htmlFor="prioridad">Prioridad</label>
-          <select
-            id="prioridad"
-            name="prioridad"
-            ref={prioridadRef}
-            value={form.prioridad}
-            onChange={manejarCambio}
-            aria-invalid={errores.prioridad ? 'true' : undefined}
-            aria-describedby={errores.prioridad ? 'error-prioridad' : undefined}
-          >
-            <option value="">-- Selecciona --</option>
-            {Object.entries(PRIORIDADES).map(([valor, texto]) => (
-              <option key={valor} value={valor}>{texto}</option>
-            ))}
-          </select>
-          {errores.prioridad && (
-            <p id="error-prioridad" className="error" role="alert">
-              {errores.prioridad}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <label htmlFor="severidad">Severidad</label>
-          <select
-            id="severidad"
-            name="severidad"
-            ref={severidadRef}
-            value={form.severidad}
-            onChange={manejarCambio}
-            aria-invalid={errores.severidad ? 'true' : undefined}
-            aria-describedby={errores.severidad ? 'error-severidad' : undefined}
-          >
-            <option value="">-- Selecciona --</option>
-            {Object.entries(SEVERIDADES).map(([valor, texto]) => (
-              <option key={valor} value={valor}>{texto}</option>
-            ))}
-          </select>
-          {errores.severidad && (
-            <p id="error-severidad" className="error" role="alert">
-              {errores.severidad}
-            </p>
-          )}
-        </div>
+        {campoSelect('prioridad', 'Prioridad', PRIORIDADES)}
+        {campoSelect('severidad', 'Severidad', SEVERIDADES)}
       </div>
 
-      {errores.body && <p className="error" role="alert">{errores.body}</p>}
-      {errorGeneral && <p className="error" role="alert">{errorGeneral}</p>}
-
-      <button type="submit" disabled={enviando}>
-        {enviando ? 'Guardando...' : 'Crear bug'}
-      </button>
+      <div className="acciones">
+        <button className="btn btn-primario" type="submit" disabled={enviando}>
+          {enviando ? 'Guardando…' : 'Reportar bug'}
+        </button>
+        <button className="btn btn-secundario" type="button" onClick={limpiar}>Limpiar</button>
+      </div>
     </form>
   )
 }

@@ -1,0 +1,72 @@
+/* Estilos de la app según la guía TRIAGE. Solo usamos variables de tokens.css,
+   así el tema claro y el oscuro funcionan sin duplicar reglas. */
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-ui); font-size: var(--fs-base); line-height: var(--lh); }
+
+/* Encabezado con logo, navegación y botón de tema */
+.encabezado { display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-4) var(--sp-6); border-bottom: 1px solid var(--border); background: var(--surface); }
+.encabezado .marca { font-size: var(--fs-lg); letter-spacing: .04em; color: var(--primary); font-weight: 700; }
+.encabezado nav { margin-left: auto; display: flex; gap: var(--sp-4); align-items: center; }
+.encabezado nav a { color: var(--muted); text-decoration: none; }
+.encabezado nav a:hover { color: var(--text); }
+
+.contenedor { max-width: 960px; margin: 0 auto; padding: var(--sp-6); }
+.tarjeta { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: var(--sp-5); margin-bottom: var(--sp-5); }
+.tarjeta > h2 { margin: 0 0 var(--sp-4); font-size: var(--fs-lg); }
+
+/* Campos */
+.campo { margin-bottom: var(--sp-4); }
+label { display: block; font-size: var(--fs-sm); font-weight: 500; margin-bottom: var(--sp-1); }
+input, textarea, select { width: 100%; padding: var(--sp-2) var(--sp-3); border: 1px solid var(--border); border-radius: var(--r-md); background: var(--bg); color: var(--text); font: inherit; }
+textarea { min-height: 96px; resize: vertical; }
+input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 3px solid var(--secondary); outline-offset: 2px; }
+/* Detalle QA #3: el borde rojo también aplica a los select inválidos */
+input[aria-invalid="true"], textarea[aria-invalid="true"], select[aria-invalid="true"] { border: 2px solid var(--error); }
+
+/* Pie de campo: mensaje de error a la izquierda, contador a la derecha */
+.pie { display: flex; justify-content: space-between; gap: var(--sp-2); font-size: var(--fs-xs); margin-top: var(--sp-1); }
+/* Contador: gris < 90 %, ámbar del 90 % al 100 %, rojo al exceder */
+.contador { margin-left: auto; font-family: var(--font-mono); color: var(--muted); }
+.contador.cerca { color: var(--warning); }
+.contador.excede { color: var(--error); font-weight: 600; }
+.error { color: var(--error); }
+
+/* Detalle QA #4: Prioridad y Severidad en la misma fila, mismo ancho */
+.fila { display: flex; gap: var(--sp-4); }
+.fila > div { flex: 1; }
+
+/* Botones */
+.btn { font: inherit; font-weight: 700; padding: var(--sp-2) var(--sp-5); border-radius: var(--r-md); border: 2px solid transparent; cursor: pointer; }
+.btn-primario { background: var(--primary); color: var(--onprimary); }
+.btn-secundario { background: transparent; color: var(--text); border-color: var(--border); }
+.btn:focus-visible { outline: 3px solid var(--secondary); outline-offset: 2px; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn-tema { padding: var(--sp-1) var(--sp-3); font-size: var(--fs-sm); }
+.acciones { display: flex; gap: var(--sp-3); }
+
+/* Alertas */
+.alerta { padding: var(--sp-3) var(--sp-4); border-radius: var(--r-md); border: 1px solid; border-left-width: 4px; margin-bottom: var(--sp-4); background: var(--bg); }
+.alerta.ok { border-color: var(--success); color: var(--success); }
+.alerta.mal { border-color: var(--error); color: var(--error); }
+.alerta span { color: var(--text); }
+
+/* Badges: el texto siempre acompaña al color */
+.badge { display: inline-block; padding: 1px 10px; border-radius: var(--r-pill); font-size: var(--fs-xs); font-weight: 700; border: 1.5px solid var(--c); color: var(--c); }
+.badge.solido { background: var(--c); color: var(--bg); }
+.b-BAJA { --c: var(--success); } .b-MEDIA { --c: var(--warning); } .b-ALTA { --c: var(--alta); } .b-CRITICA { --c: var(--error); } .b-ABIERTO { --c: var(--info); }
+.b-EN_PROGRESO { --c: var(--warning); } .b-RESUELTO { --c: var(--success); } .b-CERRADO { --c: var(--muted); }
+
+/* Tabla */
+table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); }
+caption { text-align: left; color: var(--muted); padding-bottom: var(--sp-2); }
+th, td { text-align: left; padding: var(--sp-2) var(--sp-3); border-bottom: 1px solid var(--border); }
+th { color: var(--muted); font-weight: 500; }
+td time { white-space: nowrap; }
+.mono { font-family: var(--font-mono); }
+.vacio { text-align: center; padding: var(--sp-7) var(--sp-4); color: var(--muted); }
+.vacio h3 { color: var(--text); margin: var(--sp-3) 0 var(--sp-1); }
+.sk { display: block; height: 14px; border-radius: var(--r-sm); background: var(--border); animation: pulso 1.2s infinite; }
+@keyframes pulso { 50% { opacity: .4; } }
+
+/* Texto solo para lectores de pantalla */
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

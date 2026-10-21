@@ -1,0 +1,39 @@
+/* Tokens de diseño TRIAGE (copiados de la guía de estilo). Tema oscuro por defecto; .light en <html> activa el claro. */
+:root {
+  --font-ui: 'Space Grotesk', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --fs-xs: 12px; --fs-sm: 14px; --fs-base: 16px; --fs-lg: 20px; --fs-xl: 24px; --fs-2xl: 30px; --fs-3xl: 36px;
+  --lh: 1.5;
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px; --sp-6: 32px; --sp-7: 48px;
+  --r-sm: 4px; --r-md: 6px; --r-lg: 10px; --r-pill: 999px;
+}
+.dark, :root {
+  --primary: #F59E0B;
+  --onprimary: #0F1115;
+  --secondary: #22D3EE;
+  --bg: #0F1115;
+  --surface: #1A1D24;
+  --text: #E5E7EB;
+  --muted: #9CA3AF;
+  --border: #374151;
+  --success: #4ADE80;
+  --warning: #FBBF24;
+  --error: #F87171;
+  --info: #60A5FA;
+  --alta: #FB923C;
+}
+.light {
+  --primary: #B45309;
+  --onprimary: #FFFFFF;
+  --secondary: #0E7490;
+  --bg: #FAFAF7;
+  --surface: #FFFFFF;
+  --text: #1A1D24;
+  --muted: #4B5563;
+  --border: #D1D5DB;
+  --success: #15803D;
+  --warning: #A16207;
+  --error: #B91C1C;
+  --info: #1D4ED8;
+  --alta: #C2410C;
+}
